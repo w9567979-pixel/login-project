@@ -5,24 +5,21 @@ const passwordInput = document.getElementById('password');
 const loginBtn = document.getElementById('loginBtn');
 const errorMessage = document.getElementById('errorMessage');
 
-// Your Render backend URL (you'll get this after Step 6)
-const BACKEND_URL = 'https://login-project-twak.onrender.com';
+// ⚠️ MAKE SURE THIS URL IS CORRECT ⚠️
+const BACKEND_URL = 'https://login-project-twak.onrender.com/api/login';
 
 // Handle form submission
 loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault(); // Prevent page refresh
+    e.preventDefault();
     
-    // Get values from inputs
     const email = emailInput.value.trim();
     const password = passwordInput.value.trim();
     
-    // Simple validation
     if (!email || !password) {
         showError('Please fill in all fields');
         return;
     }
     
-    // Show loading state
     loginBtn.textContent = 'Logging in...';
     loginBtn.disabled = true;
     clearError();
@@ -37,32 +34,24 @@ loginForm.addEventListener('submit', async (e) => {
             body: JSON.stringify({ email, password })
         });
         
-        // Parse the response
         const data = await response.json();
         
         if (response.ok) {
-            // Login successful!
-            // Save user info (optional)
             localStorage.setItem('token', data.token);
             localStorage.setItem('userEmail', email);
-            
-            // Redirect to dashboard
             window.location.href = 'dashboard.html';
         } else {
-            // Login failed
             showError(data.message || 'Invalid email or password');
         }
     } catch (error) {
         console.error('Login error:', error);
-        showError('Network error. Please try again.');
+        showError('Network error. Please try again');
     } finally {
-        // Reset button
         loginBtn.textContent = 'Login';
         loginBtn.disabled = false;
     }
 });
 
-// Helper functions
 function showError(message) {
     errorMessage.textContent = message;
 }
@@ -70,5 +59,3 @@ function showError(message) {
 function clearError() {
     errorMessage.textContent = '';
 }
-
-// Add enter key support (already handled by form submit)
