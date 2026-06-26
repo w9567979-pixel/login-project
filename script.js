@@ -5,8 +5,8 @@ const passwordInput = document.getElementById('password');
 const loginBtn = document.getElementById('loginBtn');
 const errorMessage = document.getElementById('errorMessage');
 
-// ⚠️ YOUR RENDER BACKEND URL - UPDATE THIS!
-const BACKEND_URL = 'https://login-project-twak.onrender.com/api/login';
+// Backend URL - UPDATE THIS WITH YOUR RENDER URL
+const BACKEND_URL = 'https://login-project-twak.onrender.com/api/auth/login';
 
 // Handle form submission
 loginForm.addEventListener('submit', async (e) => {
@@ -44,13 +44,27 @@ loginForm.addEventListener('submit', async (e) => {
             // Login successful!
             // Save user info
             localStorage.setItem('token', data.token);
-            localStorage.setItem('userEmail', email);
+            localStorage.setItem('userEmail', data.user.email);
+            localStorage.setItem('userFullName', data.user.fullName);
+            localStorage.setItem('userId', data.user.id);
+            localStorage.setItem('userRole', data.user.role || 'user');
+            localStorage.setItem('isAdmin', data.user.isAdmin || false);
             
-            // Redirect to dashboard
-            window.location.href = 'dashboard.html';
+            // Redirect based on role
+            if (data.user.isAdmin || data.user.role === 'admin') {
+                window.location.href = 'admin-dashboard.html';
+            } else {
+                window.location.href = 'dashboard.html';
+            }
         } else {
-            // Login failed
-            showError(data.message || 'Invalid email or password');
+            // Login failed - Check if it's a status issue
+            if (data.status === 'pending') {
+                showError('⏳ Your account is pending admin approval. Please wait.');
+            } else if (data.status === 'rejected') {
+                showError('❌ Your account was rejected. Please contact support.');
+            } else {
+                showError(data.message || 'Invalid email or password');
+            }
         }
     } catch (error) {
         console.error('Login error:', error);
@@ -65,8 +79,25 @@ loginForm.addEventListener('submit', async (e) => {
 // Helper functions
 function showError(message) {
     errorMessage.textContent = message;
+    errorMessage.style.color = '#e74c3c';
 }
 
 function clearError() {
     errorMessage.textContent = '';
 }
+
+// Add enter key support (already handled by form submit)
+
+// Optional: Check if user is already logged in
+document.addEventListener('DOMContentLoaded', function() {
+    const token = localStorage.getItem('token');
+    if (token) {
+        // User is already logged in, redirect
+        const isAdmin = localStorage.getItem('isAdmin') === 'true';
+        if (isAdmin) {
+            window.location.href = 'admin-dashboard.html';
+        } else {
+            window.location.href = 'dashboard.html';
+        }
+    }
+});
