@@ -25,17 +25,22 @@
     </div>
     
     <script>
-        // Display user email
+        // Display user info
+        const userFullName = localStorage.getItem('userFullName');
         const userEmail = localStorage.getItem('userEmail');
-        if (userEmail) {
+        
+        if (userFullName) {
+            document.getElementById('userGreeting').textContent = 
+                `Welcome back, ${userFullName}! (${userEmail})`;
+        } else if (userEmail) {
             document.getElementById('userGreeting').textContent = 
                 `Welcome back, ${userEmail}!`;
         }
         
-        // Logout function
         function logout() {
             localStorage.removeItem('token');
             localStorage.removeItem('userEmail');
+            localStorage.removeItem('userFullName');
             window.location.href = 'index.html';
         }
     </script>
