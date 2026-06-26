@@ -5,7 +5,7 @@ const passwordInput = document.getElementById('password');
 const loginBtn = document.getElementById('loginBtn');
 const errorMessage = document.getElementById('errorMessage');
 
-// Your Render backend URL (you'll get this after Step 6)
+// ⚠️ YOUR RENDER BACKEND URL - UPDATE THIS!
 const BACKEND_URL = 'https://login-project-twak.onrender.com/api/login';
 
 // Handle form submission
@@ -42,7 +42,7 @@ loginForm.addEventListener('submit', async (e) => {
         
         if (response.ok) {
             // Login successful!
-            // Save user info (optional)
+            // Save user info
             localStorage.setItem('token', data.token);
             localStorage.setItem('userEmail', email);
             
@@ -54,7 +54,7 @@ loginForm.addEventListener('submit', async (e) => {
         }
     } catch (error) {
         console.error('Login error:', error);
-        showError('Network error. Please try again.');
+        showError('Network error. Please try again');
     } finally {
         // Reset button
         loginBtn.textContent = 'Login';
@@ -70,5 +70,3 @@ function showError(message) {
 function clearError() {
     errorMessage.textContent = '';
 }
-
-// Add enter key support (already handled by form submit)
