@@ -1,19 +1,29 @@
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(cors());
+// ✅ IMPROVED CORS CONFIGURATION
+app.use(cors({
+    origin: '*', // Allows all origins (for testing)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// OR if you want to allow only your Netlify site:
+// app.use(cors({
+//     origin: 'https://your-netlify-site.netlify.app',
+//     methods: ['GET', 'POST'],
+//     allowedHeaders: ['Content-Type']
+// }));
+
 app.use(express.json());
 
-// Secret key (in production, use environment variable)
-const JWT_SECRET = 'your-secret-key-here-change-this';
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-here-change-this';
 
-// Sample user database (in production, use real database)
+// Sample users
 const users = [
     {
         id: 1,
@@ -22,19 +32,31 @@ const users = [
     }
 ];
 
-// Login endpoint
+// Root route
+app.get('/', (req, res) => {
+    res.json({ 
+        status: 'success',
+        message: 'Login API is running!',
+        endpoints: {
+            login: '/api/login',
+            health: '/api/health'
+        }
+    });
+});
+
+// ✅ LOGIN ENDPOINT (make sure this is EXACT)
 app.post('/api/login', async (req, res) => {
+    console.log('Login attempt:', req.body); // Log for debugging
+    
     try {
         const { email, password } = req.body;
         
-        // Check if email and password are provided
         if (!email || !password) {
             return res.status(400).json({ 
                 message: 'Email and password are required' 
             });
         }
         
-        // Find user (in production, query database)
         const user = users.find(u => u.email === email);
         
         if (!user) {
@@ -43,22 +65,19 @@ app.post('/api/login', async (req, res) => {
             });
         }
         
-        // Check password (in production, use bcrypt.compare)
-        // For demo, accept "password123" as valid
+        // For demo - accept "password123"
         if (password !== 'password123') {
             return res.status(401).json({ 
                 message: 'Invalid email or password' 
             });
         }
         
-        // Create JWT token
         const token = jwt.sign(
             { userId: user.id, email: user.email },
             JWT_SECRET,
             { expiresIn: '24h' }
         );
         
-        // Send success response
         res.json({
             message: 'Login successful',
             token: token,
@@ -76,12 +95,11 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// Health check endpoint
+// Health check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', message: 'Server is running' });
 });
 
-// Start server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
