@@ -6,7 +6,7 @@ const loginBtn = document.getElementById('loginBtn');
 const errorMessage = document.getElementById('errorMessage');
 
 // Your Render backend URL (you'll get this after Step 6)
-const BACKEND_URL = 'https://your-app-name.onrender.com/api/login';
+const BACKEND_URL = 'https://login-project.onrender.com/api/login';
 
 // Handle form submission
 loginForm.addEventListener('submit', async (e) => {
